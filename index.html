@@ -81,7 +81,7 @@ There had been a lot of research studies that focused on classification of 2D CT
 <h3>Approach</h3>
 <h5>Datasets</h5>
 The following datasets are used to train, validate and test the efficiency of neural
-network. Each data set contain stacks of axial CT scans of lungs. Scans showing symptoms of
+network. Each data set contains stacks of axial CT scans of lungs. Scans showing symptoms of
 COVID-19 are manually selected to be classified as positive test cases. Before using these images
 for training the network, they are aligned (that is, body facing upwards and left lung on left side of
 the image)
@@ -92,12 +92,16 @@ the image)
 The combined dataset contains 3199 COVID positive CT images and 3650 COVID
 negative CT images.
 
-<h5>DenseNet</h5>
-Initial implementation of our neural network uses DenseNet-121. DenseNet-121 is a convolutional
-neural network based on DenseNet. There are 4 dense blocks in the network and each dense block in
-the network contains 4 convolutional layers with a filter size of (3*3). Compared to other state of the art
-CNNs like ResNet, DenseNet provides higher parameter and computational efficiency, and higher
-accuracy.
+The following pie charts show the number of images used for training, validating and testing the network:
+
+<div style="text-align: center;">
+<img style="height:300px;" alt="" src="positive.png">
+<figcaption>Figure 4: The distribution of the COVID positive dataset</figcaption>
+<img style="height:300px;" alt="" src="negative.png">
+<figcaption>Figure 5: The distribution of the COVID negative dataset</figcaption>
+</div>
+<br><br>
+
 <h5>Transfer Learning</h5>
 In machine learning transfer learning is a technique of training the neural network on an auxiliary task
 and applying the trained network for target task. For this application, a CNN is trained with an ImageNet
@@ -115,15 +119,6 @@ non-medical concepts. Therefore the transferability of trained network to CT ima
 <br><br>
 
 <h3>Experiments and Results</h3>
-Following pie chart shows the number of images used for training, validating and testing the network:
-
-<div style="text-align: center;">
-<img style="height:300px;" alt="" src="positive.png">
-<figcaption>Figure 4: The distribution of the COVID positive dataset</figcaption>
-<img style="height:300px;" alt="" src="negative.png">
-<figcaption>Figure 5: The distribution of the COVID negative dataset</figcaption>
-</div>
-<br><br>
 
 
 <h5>Backbone network</h5>
