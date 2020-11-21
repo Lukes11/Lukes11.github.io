@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en"><head>  
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta charset="utf-8">
+  <title>Computer Vision Course Project
+  | ECE, Virginia Tech | Fall 2020: ECE 4554/5554</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+<!-- Le styles -->  
+  <link href="css/bootstrap.css" rel="stylesheet">
+<style>
+body {
+padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+.vis {
+color: #3366CC;
+}
+.data {
+color: #FF9900;
+}
+
+</style>
+  
+<link href="css/bootstrap-responsive.min.css" rel="stylesheet">
+
+<!-- HTML5 shim, for IE6-8 support of HTML5 elements --><!--[if lt IE 9]>
+<script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+<![endif]-->
+</head>
+
+<body>
+<div class="container">
+<div class="page-header">
+
+<!-- Title and Name --> 
+<h1>Classification of Computed Tomography Images for COVID-19 testing using a Convolutional Neural Network</h1> 
+<span style="font-size: 20px; line-height: 1.5em;"><strong>Garvit Goel, Luke Sanyour</strong></span><br>
+<span style="font-size: 18px; line-height: 1.5em;">Fall 2020 ECE 4554/5554 Computer Vision: Course Project</span><br>
+<span style="font-size: 18px; line-height: 1.5em;">Virginia Tech</span><br>
+<span style="font-size: 18px; line-height: 1.5em;">Code Base: <a href="https://github.com/garvit217-vt/cv_project">https://github.com/garvit217-vt/cv_project</a></span>
+<hr>
+
+
+<!-- figure -->
+<br><br>
+<!-- Main Illustrative Figure --> 
+<div style="text-align: center;">
+<img style="height: 300px;" alt="" src="teaser.png">
+<figcaption>Figure 1: Examples of different types of cloud-like structure patterns found in CT scans of positive COVID-19 patients.</figcaption>
+</div>
+<br><br>
+<div style="text-align: center;">
+  <img style="height: 255px;" alt="" src="network.png">
+  <figcaption>Figure 2: A deep learning framework for COVID-19 testing using 2D CT images</figcaption>
+  </div>
+<br><br>
+<!-- Introduction -->
+
+<h3>Abstract</h3>
+More than 30 million people have been been infected by the Corona virus (COVID-19) all over the world. The
+numbers grow exponentially everyday. One of the biggest challenges to control the spread of virus is the
+limited effectiveness of testing methods to identify the presence of SARS-CoV-2 virus found in
+positive COVID-19 testcases. Conventional Reverse transcription polymerase chain reaction (RT-PCR)
+based testing for COVID-19 has low accuracy and high turnaround time (~4-6 hours). Therefore there
+has been an increased effort to adopt CT scan based COVID 19 testing. Patients tested positive with the
+COVID-19 virus show unique abnormalities in lung CT scans. These include Ground Glass Opacities
+(GGO), crazy paving patterns and reverse halo. In this work, we used deep convolutional neural
+networks to extract these features from 2D CT images and classify them into positive and negative cases.
+Specifically, we created a dataset containing ~1800 COVID positive CT images and ~1450 COVID
+negative CT images. We used these images to train, validate and test a convolutional neural network
+based on Densenet, pretrained with ImageNet dataset leveraging transfer learning. Initial experiments
+show that we achieved an accuracy and F1 score of 0.99 and 0.99 respectively.
+<h3>Introduction</h3>
+Currently, the only widespread testing method in practice is Reverse Transcription Polymerase Chain Reaction method (RT-PCR), which takes between 4 and 6 hours to produce a result, and there has been shortages RT-PCR testing kits. Many studies have concluded that CT scans show clear signs even to the layman of the presence of the SARS-CoV-2 virus, which manifests itself as cloud-like structures in the lungs [3]. This is favorable, since CT scans are fast, cheap, and this approach has the potential to provide reasonably accurate results, as much as 94% accurate using a simple convolutional neural network in a similar study done by Maghdid et al. with very little data preprocessing [4]. Because any given CT lung scan of a positive COVID patient can manifest these clear and unique features, a clear approach would be to train a neural network to extract these cloud-like features, and learn to classify CT scans as having the SARS-CoV-2 virus present or not. 
+We will apply transfer learning to fine tune the weights of pre-trained convolutional networks like DenseNet, or ImageNet as they are purpose built for image classification and are suited well for this task [5]. This approach has been shown to be effective in the field of visual recognition and is already in widespread use in the medical field to classify tumors or detect pneumonia [3], which is a very similar problem to our own. We will use several performance metrics to validate our network, these include overall accuracy, sensitivity, and specificity among others. Ultimately, we will use transfer learning to tune the parameters of several pre-trained models to compare different approaches and achieve the best results. There had been a lot of research studies that focused on classification of 2D CT images for
+There had been a lot of research studies that focused on classification of 2D CT images for COVID-19 testing. Maghdid et al. [4] used a pretrained model of AlexNet to achieve a classification accuracy of 94%. Gozes et al [6] used ResNet-50 for image classification pretrained using ImageNet and showed that their version of neural network achieved sensitivity an specificity of 96% and 98% respectively. They used UNet to segment the lung region in CT images. Wang et al. [7] used lung segmentation and a deep convolutional network based on DenseNet and achieved 78% sensitivity and 89% specificity. Selva et al. [8] used data augmentation to implement self supervised learning with EfficientNet backbone as backbone network and showed that the network was 98.5% accurate. Qianqian et al [9s] showed that deep CNNs can also be used to automatic detection of lesions in CT images. Their CNN is based on MVPNet.
+<br><br>
+<!-- Approach -->
+<h3>Approach</h3>
+<h5>Datasets</h5>
+The following datasets are used to train, validate and test the efficiency of neural
+network. Each data set contain stacks of axial CT scans of lungs. Scans showing symptoms of
+COVID-19 are manually selected to be classified as positive test cases. Before using these images
+for training the network, they are aligned (that is, body facing upwards and left lung on left side of
+the image)
+<ol>
+<li>BINCY-COVID19+ (https://osf.io/nh7g8/files/): This dataset contains NII files. All of the images in this dataset are COVID-19 positive test cases. The CT slices showing the presence of SARS-CoV2 virus are selected manually from each stack</li>
+<li>The Cancer Imaging Archive (https://wiki.cancerimagingarchive.net/display/Public/LIDC-IDRI): The dataset contains DICOM files. All of the images in this dataset are COVID-19 negative test cases.</li>
+</ol>
+The combined dataset contains 3199 COVID positive CT images and 3650 COVID
+negative CT images.
+
+<h5>DenseNet</h5>
+Initial implementation of our neural network uses DenseNet-121. DenseNet-121 is a convolutional
+neural network based on DenseNet. There are 4 dense blocks in the network and each dense block in
+the network contains 4 convolutional layers with a filter size of (3*3). Compared to other state of the art
+CNNs like ResNet, DenseNet provides higher parameter and computational efficiency, and higher
+accuracy.
+<h5>Transfer Learning</h5>
+In machine learning transfer learning is a technique of training the neural network on an auxiliary task
+and applying the trained network for target task. For this application, a CNN is trained with an ImageNet
+dataset that contains images of generic objects like dogs, cats, or tables so that the network learns to extract
+distinctive features from the input images. The trained network is fine tuned with target dataset for CT
+image classification.
+
+A major challenge of using the ImageNet dataset for transfer learning is that the dataset contains images of
+non-medical concepts. Therefore the transferability of trained network to CT image dataset is uncertain.
+<br><br>
+<div style="text-align: center;">
+<img style="height: 300px;" alt="" src="transfer.png">
+<figcaption>Figure 3: An overview of the mechanics of transfer learning.</figcaption>
+</div>
+<br><br>
+
+<h3>Experiments and Results</h3>
+Following pie chart shows the number of images used for training, validating and testing the network:
+
+<div style="text-align: center;">
+<img style="height:300px;" alt="" src="positive.png">
+<figcaption>Figure 4: The distribution of the COVID positive dataset</figcaption>
+<img style="height:300px;" alt="" src="negative.png">
+<figcaption>Figure 5: The distribution of the COVID negative dataset</figcaption>
+</div>
+<br><br>
+
+
+<h5>Backbone network</h5>
+The backbone network for image classification is primarily DenseNet-121. DenseNet-121 is a convolutional neural network based on DenseNet. There are 4 dense blocks in the network and each dense block in the network contains 4 convolutional layers with a filter size of (3*3). Compared to other state of the art CNNs like ResNet, DenseNet provides higher parameter and computational efficiency, and higher accuracy.
+The performance of the DenseNet121 was also compared against DenseNet-169. ResNet-50 & VGG CNNs.
+The network is trained with the ImageNet dataset to implement transfer learning. The original CT images (gray scale) are transformed into 3 channel RGB images by copying the image data into three channels and batch normalized to maintain image shape and data range consistency between the ImageNet and CT datasets.
+For training the network, the ADAM optimizer is used with cross entropy loss function to calculate the output error. The network was trained for 15 epochs.
+<br><br>
+To achieve the optimal values of hyper-parameters, the experiments seen in table 1 were preformed.
+<br><br>
+<div style="text-align: center;">
+  <img style="height: 300px;" alt="" src="experiments.png">
+  <figcaption>Table 1: Network training experiments with varying learning rate methodoligies</figcaption>
+</div>
+<br><br>
+
+
+<h5>Qualitative Results</h5>
+The results of the trained neural network are quantified using following metrics:
+<ol>
+  <li>Accuracy = (TP+TN)/(TP+TN+FP+FN)</li>
+  <li>Precision = TP/(TP+FP)</li>
+  <li>Recall = TP/(TP+FN)</li>
+  <li>F1-score = 2/(recall-1 + precision-1)</li>
+  <li>AUC, which is the area under the receiver operating characteristic curve showing how false positive
+    rate increases as true positive rate increases</li>
+</ol>
+Where TP, FP, TN and FN represents true positive, false positive, true negative and false negative predictions.
+Figures 6-13 show the validation accuracy, testing accuracy, and training loss. Table 2 shows the classification accuracy over the test set. 
+<br><br>
+
+
+<div class="image123">
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+      <img src="trainloss1.png" height="300" width="300"/>
+      <p style="font-size: 12px">Figure 6: Learning rate vs. Training Loss</p>
+  </div>
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+      <img class="middle-img" src="valid1.png"/ height="300" width="300"/>
+      <p style="font-size: 12px">Figure 7: Learning rate vs. Validation accuracy</p>
+  </div>
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+       <img src="trainloss2.png"/ height="300" width="300"/>
+       <p style="font-size: 12px">Figure 8: Train Loss with cosine annealint learning rate</p>
+  </div>
+</div>
+
+<div class="image123">
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+      <img src="valid2.png" height="300" width="300"/>
+      <p style="font-size: 12px">Figure 9: Learning rate vs. Training Loss</p>
+  </div>
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+      <img class="middle-img" src="trainloss3.png"/ height="300" width="300"/>
+      <p style="font-size: 12px">Figure 10: Training loss vs.learning rate / gamma exponential decay</p>
+  </div>
+  <div style="width: 33%; text-align: center;" class="imgContainer">
+       <img src="valid3.png"/ height="300" width="300"/>
+       <p style="font-size: 12px">Figure 11: Learning rate vs. validation accuracy / gamma exponential decay</p>
+  </div>
+</div>
+
+
+
+<div style="width: 50%; text-align: center;" class="imgContainer">
+    <img src="trainloss4.png" height="300" width="300"/>
+    <p style="font-size: 12px">Figure 12: Learning rate vs. Training Loss / different backbone networks</p>
+</div>
+<div style="width: 50%; text-align: center;" class="imgContainer">
+    <img src="vaild4.png"/ height="300" width="300"/>
+    <p style="font-size: 12px">Figure 13:  Learning rate vs. validation accuracy / different backbone networks</p>
+</div>
+<div style="text-align: center;">
+  <img style="height: 400px;" alt="" src="testAcc.PNG">
+  <figcaption>Table 2: classification performance with test set</figcaption>
+</div>
+
+<br><br>
+<h5>Discussion of Results</h5>
+DenseNet-121 achieves an optimal performance with initial learning rate 0.001 and cosine annealing learning rate updation.
+At constant learning rate, the network is able to minimize the loss function, however the testing and validation accuracy remains low. 
+The training loss curve with exponentially decaying learning rate has a lot of disturbance, which might be the result of gradient explosion. Using smaller initial learning rate and gamma might be able to solve the problem. 
+Among different backbone networks, DenseNet-121 clearly outperforms all other CNNs. However, the DenseNet-121 was optimized for hyper parameters, while all other networks were trained and tested on same values of hyper parameters. The measurement of effectiveness of image classification using DenseNet-169, ResNet-50, and VGG requires tuning of hyper parameters for the target application.
+
+
+<h3>Conclusion and Future Work</h3>
+In this work, we evaluated the efficacy of a convolutional deep neural network, based on  DenseNet-121, in classifying CT images for COVID-19 testing. We leveraged transfer learning to train the network to extract generic features from the input image. The optimal network achieved a classification accuracy of 99.3%. We also compared the the efficiency of DenseNet-121, against other state of the art deep CNNs (DenseNet-169, ResNet-5-. VGG-16) and concluded that DenseNet-121 outperforms other networks.
+However, since the network was trained and tested on one dataset, there is a possibility that the network is over fitting the training data. 
+In our future work, we intend to test the network on bigger dataset and use techniques like image segmentation for pre-processing input data. This might help convolutional neural network to extract distinctive COVID-19 features from region of interest in input CT image.
+
+<h3>References:</h3>
+<ol>
+<li>Sharma, Sachin. "Drawing insights from COVID-19-infected patients using CT scan images and machine learning techniques: a study on 200 patients."Environmental Science and Pollution Research (2020): 1-9.</li>
+<li>Singh, Dilbag, Vijay Kumar, and Manjit Kaur. "Classification of COVID-19 patients from chest CT images using multi-objective differential evolution–based convolutional neural networks."European Journal of Clinical Microbiology & Infectious Diseases (2020): 1-11.</li>
+<li>He, Xuehai, et al. "Sample-Efficient Deep Learning for COVID-19 Diagnosis Based on CT Scans."medRxiv (2020).</li>
+<li>Maghdid, Halgurd S., et al. "Diagnosing COVID-19 pneumonia from X-ray and CT images using deep learning and transfer learning algorithms." arXiv preprint arXiv:2004.00038 (2020).</li>
+<li>Mishra, Arnab Kumar, et al. "Identifying COVID19 from Chest CT Images: A Deep Convolutional Neural Networks Based Approach." Journal of Healthcare Engineering 2020 (2020).</li>
+<li>Gozes, Ophir, et al. "Rapid ai development cycle for the coronavirus (covid-19) pandemic: Initial results for automated detection & patient monitoring using deep learning ct image analysis." arXiv preprint arXiv:2003.05037 (2020).</li>
+<li>Wang, Shuo, et al. "A fully automatic deep learning system for COVID-19 diagnostic and prognostic analysis." European Respiratory Journal (2020).</li>
+<li>Silva, Pedro, et al. "COVID-19 Detection in CT Images with Deep Learning: A Voting-based Scheme and Cross-Datasets Analysis." Informatics in Medicine Unlocked (2020): 100427.</li>
+<li>Ni, Qianqian, et al. "A deep learning approach to characterize 2019 coronavirus disease (COVID-19) pneumonia in chest CT images." European radiology (2020): 1-11.</li>
+
+</ol>
+
+The code for implementation of a CNN was derived from following repository: <a href="https://github.com/UCSD-AI4H/COVID-CT.git">https://github.com/UCSD-AI4H/COVID-CT.git</a>
+<br><br>
+  <hr>
+  <footer> 
+  <p>© Garivit Goel, Luke Sanyour</p>
+  </footer>
+</div>
+</div>
+
+<br><br>
+
+</body></html>
