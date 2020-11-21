@@ -68,10 +68,10 @@ has been an increased effort to adopt CT scan based COVID 19 testing. Patients t
 COVID-19 virus show unique abnormalities in lung CT scans. These include Ground Glass Opacities
 (GGO), crazy paving patterns and reverse halo. In this work, we used deep convolutional neural
 networks to extract these features from 2D CT images and classify them into positive and negative cases.
-Specifically, we created a dataset containing ~1800 COVID positive CT images and ~1450 COVID
+Specifically, we created a dataset containing ~3199 COVID positive CT images and ~3650 COVID
 negative CT images. We used these images to train, validate and test a convolutional neural network
-based on Densenet, pretrained with ImageNet dataset leveraging transfer learning. Initial experiments
-show that we achieved an accuracy and F1 score of 0.99 and 0.99 respectively.
+based on Densenet, pretrained with ImageNet dataset leveraging transfer learning. Our final result shows an accuracy of ~99% in the 
+most effective configuration. 
 <h3>Introduction</h3>
 Currently, the only widespread testing method in practice is Reverse Transcription Polymerase Chain Reaction method (RT-PCR), which takes between 4 and 6 hours to produce a result, and there has been shortages RT-PCR testing kits. Many studies have concluded that CT scans show clear signs even to the layman of the presence of the SARS-CoV-2 virus, which manifests itself as cloud-like structures in the lungs [3]. This is favorable, since CT scans are fast, cheap, and this approach has the potential to provide reasonably accurate results, as much as 94% accurate using a simple convolutional neural network in a similar study done by Maghdid et al. with very little data preprocessing [4]. Because any given CT lung scan of a positive COVID patient can manifest these clear and unique features, a clear approach would be to train a neural network to extract these cloud-like features, and learn to classify CT scans as having the SARS-CoV-2 virus present or not. We will apply transfer learning to fine tune the weights of pre-trained convolutional networks like DenseNet, or ImageNet as they are purpose built for image classification and are suited well for this task [5]. This approach has been shown to be effective in the field of visual recognition and is already in widespread use in the medical field to classify tumors or detect pneumonia [3], which is a very similar problem to our own. There had been a lot of research studies that focused on classification of 2D CT images for COVID-19 testing. Maghdid et al. [4] used a pretrained model of AlexNet to achieve a classification accuracy of 94%. Gozes et al [6] used ResNet-50 for image classification pretrained using ImageNet and showed that their version of neural network achieved sensitivity an specificity of 96% and 98% respectively. They used UNet to segment the lung region in CT images. Wang et al. [7] used lung segmentation and a deep convolutional network based on DenseNet and achieved 78% sensitivity and 89% specificity. Selva et al. [8] used data augmentation to implement self supervised learning with EfficientNet backbone as backbone network and showed that the network was 98.5% accurate. Qianqian et al [9s] showed that deep CNNs can also be used to automatic detection of lesions in CT images. Their CNN is based on MVPNet.
 We will use several performance metrics to validate our network, these include overall accuracy, sensitivity, and specificity among others. Ultimately, we will use transfer learning to tune the parameters of several pre-trained models to compare different approaches and achieve the best results.
@@ -123,7 +123,7 @@ Initial implementation of our neural network uses DenseNet-121. DenseNet-121 is 
 
 <h5>Backbone network</h5>
 The backbone network for image classification is primarily DenseNet-121. DenseNet-121 is a convolutional neural network based on DenseNet. There are 4 dense blocks in the network and each dense block in the network contains 4 convolutional layers with a filter size of (3*3). Compared to other state of the art CNNs like ResNet, DenseNet provides higher parameter and computational efficiency, and higher accuracy.
-The performance of the DenseNet121 was also compared against DenseNet-169. ResNet-50 & VGG CNNs.
+The performance of the DenseNet-121 was also compared against DenseNet-169. ResNet-50 & VGG CNNs.
 The network is trained with the ImageNet dataset to implement transfer learning. The original CT images (gray scale) are transformed into 3 channel RGB images by copying the image data into three channels and batch normalized to maintain image shape and data range consistency between the ImageNet and CT datasets.
 For training the network, the ADAM optimizer is used with cross entropy loss function to calculate the output error. The network was trained for 15 epochs.
 <br><br>
@@ -143,14 +143,12 @@ The results of the trained neural network are quantified using following metrics
   <li>Precision = TP/(TP+FP)</li>
   <li>Recall = TP/(TP+FN)</li>
   <li>F1-score = 2/(recall-1 + precision-1)</li>
-  <li>AUC, which is the area under the receiver operating characteristic curve showing how false positive
-    rate increases as true positive rate increases</li>
 </ol>
 Where TP, FP, TN and FN represents true positive, false positive, true negative and false negative predictions.
 Figures 6-13 show the validation accuracy, testing accuracy, and training loss. Table 2 shows the classification accuracy over the test set. 
 <br><br>
 
-
+<!--
 <div class="image123">
   <div style="width: 33%; text-align: center;" class="imgContainer">
       <img src="trainloss1.png" height="300" width="300"/>
@@ -180,17 +178,50 @@ Figures 6-13 show the validation accuracy, testing accuracy, and training loss. 
        <p style="font-size: 12px">Figure 11: Learning rate vs. validation accuracy / gamma exponential decay</p>
   </div>
 </div>
-
-
-
-<div style="width: 50%; text-align: center;" class="imgContainer">
-    <img src="trainloss4.png" height="300" width="300"/>
-    <p style="font-size: 12px">Figure 12: Learning rate vs. Training Loss / different backbone networks</p>
+-->
+<div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="trainloss1.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 6: Training loss with varying learning rate</p>
+  </div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="valid1.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 7: Validation accuracy with different learning rate</p>
 </div>
-<div style="width: 50%; text-align: center;" class="imgContainer">
-    <img src="vaild4.png"/ height="300" width="300"/>
-    <p style="font-size: 12px">Figure 13:  Learning rate vs. validation accuracy / different backbone networks</p>
+
+<div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="trainloss2.png" height="370" width="370"/>
+      <p style="font-size: 12px">Figure 8: Training loss with cosine annealing learning rate updates</p>
+  </div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="valid2.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 9: Validation accuracy with cosine annealing learning rate updates</p>
 </div>
+
+
+<div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="trainloss3.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 10: Training loss with different backbone networks</p>
+  </div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="valid3.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 11: Validation accuracy with different backbone networks</p>
+</div>
+
+<div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="trainloss4.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 12: Learning rate vs. Training Loss</p>
+  </div>
+  <div style="width: 50%; text-align: center;" class="imgContainer">
+      <img src="vaild4.png" height="400" width="400"/>
+      <p style="font-size: 12px">Figure 13: Training loss vs.learning rate / gamma exponential decay</p>
+</div>
+
+
+
 <div style="text-align: center;">
   <img style="height: 400px;" alt="" src="testAcc.PNG">
   <figcaption>Table 2: classification performance with test set</figcaption>
@@ -199,8 +230,11 @@ Figures 6-13 show the validation accuracy, testing accuracy, and training loss. 
 <br><br>
 <h5>Discussion of Results</h5>
 DenseNet-121 achieves an optimal performance with initial learning rate 0.001 and cosine annealing learning rate updation.
+
 At constant learning rate, the network is able to minimize the loss function, however the testing and validation accuracy remains low. 
+<br>
 The training loss curve with exponentially decaying learning rate has a lot of disturbance, which might be the result of gradient explosion. Using smaller initial learning rate and gamma might be able to solve the problem. 
+<br>
 Among different backbone networks, DenseNet-121 clearly outperforms all other CNNs. However, the DenseNet-121 was optimized for hyper parameters, while all other networks were trained and tested on same values of hyper parameters. The measurement of effectiveness of image classification using DenseNet-169, ResNet-50, and VGG requires tuning of hyper parameters for the target application.
 
 

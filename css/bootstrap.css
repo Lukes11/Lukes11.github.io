@@ -6066,3 +6066,11 @@ a.badge:hover {
   font-size: 0;
   line-height: 0
 }
+
+.right
+
+{float: right; }
+
+.left
+
+{float: left; }
